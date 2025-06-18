@@ -1,22 +1,42 @@
+import { useEffect } from 'react';
+
 const AdSenseInArticle = () => {
-    return (
-      <div className="w-full my-8 bg-gray-100 py-4 flex justify-center rounded-md">
-        <div className="w-full h-[250px] bg-gray-200 flex items-center justify-center">
-          <span className="text-gray-500">In-Article Advertisement</span>
-          {/* Replace with actual AdSense code */}
-          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUB_ID"></script>
-          <ins
-            className="adsbygoogle"
-            style={{ display: 'block' }}
-            data-ad-client="ca-pub-YOUR_PUB_ID"
-            data-ad-slot="IN_ARTICLE_SLOT_ID"
-            data-ad-format="auto"
-            data-full-width-responsive="true"
-          ></ins>
-          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </div>
-      </div>
-    );
-  };
-  
-  export default AdSenseInArticle;
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && window.adsbygoogle) {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      }
+    } catch (e) {
+      console.error("AdSense error:", e);
+    }
+  }, []);
+
+  return (
+    <div className="w-full my-8 bg-gray-100 py-4 flex justify-center rounded-md">
+      <ins
+        className="adsbygoogle"
+        style={{ display: 'block', width: '100%' }}
+        data-ad-client="ca-pub-YOUR_PUB_ID"
+        data-ad-slot="IN_ARTICLE_SLOT_ID"
+        data-ad-format="fluid"
+        data-ad-layout="in-article"
+        data-full-width-responsive="true"
+      ></ins>
+
+      {/* Proper <noscript> handling */}
+      <div
+        dangerouslySetInnerHTML={{
+          __html: `
+            <noscript>
+              <div style="color: #9CA3AF; font-size: 0.875rem;">
+                Ad content not available.
+              </div>
+            </noscript>
+          `,
+        }}
+      />
+    </div>
+  );
+};
+
+export default AdSenseInArticle;

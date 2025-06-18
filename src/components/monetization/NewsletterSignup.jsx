@@ -29,9 +29,9 @@ const NewsletterSignup = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Your email address"
             required
-            className="flex-grow px-4 py-2 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="flex-grow px-3 py-2 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-300"
           />
-          <Button type="submit" className="whitespace-nowrap">
+          <Button type="submit" className="whitespace-nowrap px-0">
             Subscribe Now
           </Button>
         </form>
