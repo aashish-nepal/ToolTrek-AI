@@ -15,6 +15,8 @@ const Button = ({
   loading = false,
   disabled = false,
   ariaLabel,
+  isSidebarCollapsed = false, // New prop to indicate sidebar state
+  hideTextWhenCollapsed = false, // New prop to control text visibility
   ...props 
 }) => {
   // Base classes with improved spacing and transitions
@@ -32,27 +34,41 @@ const Button = ({
     premium: 'bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 text-gray-900 hover:from-amber-500 hover:via-orange-600 hover:to-pink-600 focus-visible:ring-yellow-400 shadow-lg hover:shadow-xl'
   };
   
-  // Size variants
+  // Size variants - adjusted for sidebar context
   const sizeClasses = {
     small: 'px-3 py-1.5 text-sm rounded-md',
-    medium: 'px-5 py-2.5 text-base rounded-lg',
-    large: 'px-7 py-3.5 text-lg rounded-xl'
+    medium: 'px-4 py-2 text-base rounded-lg', // Reduced horizontal padding for sidebar
+    large: 'px-5 py-3 text-lg rounded-xl' // Reduced horizontal padding for sidebar
   };
   
-  // Width control
+  // Collapsed size variants
+  const collapsedSizeClasses = {
+    small: 'p-1.5 text-sm rounded-md',
+    medium: 'p-2 text-base rounded-lg',
+    large: 'p-3 text-lg rounded-xl'
+  };
+  
+  // Width control - modified for sidebar context
   const widthClass = fullWidth ? 'w-full' : '';
   
   // Disabled state
   const disabledClasses = disabled ? 'opacity-70 cursor-not-allowed' : '';
   
+  // Text visibility classes
+  const textClasses = hideTextWhenCollapsed && isSidebarCollapsed ? 'sr-only' : '';
+  
   // Combine all classes
-  const combinedClasses = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${widthClass} ${disabledClasses} ${className}`;
+  const combinedClasses = `${baseClasses} ${variantClasses[variant]} ${
+    isSidebarCollapsed && hideTextWhenCollapsed ? collapsedSizeClasses[size] : sizeClasses[size]
+  } ${widthClass} ${disabledClasses} ${className}`;
   
   // Button content with loading state and icon support
   const buttonContent = (
     <>
       {icon && iconPosition === 'left' && !loading && (
-        <span className="mr-2 -ml-1">{icon}</span>
+        <span className={`${hideTextWhenCollapsed && isSidebarCollapsed ? 'mx-auto' : 'mr-2 -ml-1'}`}>
+          {icon}
+        </span>
       )}
       {loading ? (
         <span className="inline-flex items-center">
@@ -60,13 +76,15 @@ const Button = ({
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          {children}
+          <span className={textClasses}>{children}</span>
         </span>
       ) : (
-        children
+        <span className={textClasses}>{children}</span>
       )}
       {icon && iconPosition === 'right' && !loading && (
-        <span className="ml-2 -mr-1">{icon}</span>
+        <span className={`${hideTextWhenCollapsed && isSidebarCollapsed ? 'mx-auto' : 'ml-2 -mr-1'}`}>
+          {icon}
+        </span>
       )}
     </>
   );
@@ -100,7 +118,7 @@ const Button = ({
         <Link
           href={href}
           className={combinedClasses}
-          aria-label={ariaLabel}
+          aria-label={isSidebarCollapsed && hideTextWhenCollapsed ? ariaLabel || children : ariaLabel}
           aria-disabled={disabled}
           {...props}
         >
@@ -122,7 +140,7 @@ const Button = ({
       <Component
         className={combinedClasses}
         disabled={disabled}
-        aria-label={ariaLabel}
+        aria-label={isSidebarCollapsed && hideTextWhenCollapsed ? ariaLabel || children : ariaLabel}
         aria-busy={loading}
         {...props}
       >
