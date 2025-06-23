@@ -1,7 +1,13 @@
 import Link from 'next/link';
 
 const PopularPosts = ({ posts = [], title = "Popular Posts" }) => {
-  if (!posts || posts.length === 0) {
+  
+  // 🔍 Debug logs — ADD HERE
+  console.log("🔥 PopularPosts typeof:", typeof posts);
+  console.log("🔥 PopularPosts Array.isArray?", Array.isArray(posts));
+  console.log("🔥 PopularPosts full:", posts);
+
+  if (!Array.isArray(posts) || posts.length === 0) {
     return (
       <section className="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
         <h3 className="font-semibold text-lg mb-4 text-gray-800">{title}</h3>

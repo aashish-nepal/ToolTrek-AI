@@ -1,45 +1,29 @@
-import NewsletterSignup from '../monetization/NewsletterSignup';
 import AffiliateBanner from '../affiliate/AffiliateBanner';
 import AdSenseBanner from '../ads/AdSenseBanner';
 import ToolComparisonBanner from '../tools/ToolComparisonBanner';
 import AuthorBox from '../authors/AuthorBox';
 import PopularPosts from '../bloggers/PopularPosts';
+import { getTrendingArticles } from '../../lib/contentful';
 import CategoryList from '../bloggers/CategoryList';
 import RecentComments from '../bloggers/RecentComments';
 import { useState, useEffect } from 'react';
+import NewsletterSignup from '../monetization/NewsletterSignup';
 
-const Sidebar = () => {
+const Sidebar = ({ trendingArticles: initialTrending = [] }) => {
+  const [trending, setTrending] = useState(initialTrending);
 
-  // Sample data with enhanced semantic structure
-  const popularPosts = [
-    { 
-      id: 1, 
-      title: "Top 10 AI Writing Tools for 2024: Expert Reviews & Comparisons", 
-      url: "/top-ai-writing-tools", 
-      views: 12500, 
-      image: "/images/ai-writing.jpg",
-      datePublished: "2024-05-15T08:00:00+00:00",
-      author: "Dr. Emily Chen"
-    },
-    { 
-      id: 2, 
-      title: "How AI is Transforming Content Creation: The Complete Guide", 
-      url: "/ai-content-creation", 
-      views: 9820, 
-      image: "/images/ai-content.jpg",
-      datePublished: "2024-04-22T09:30:00+00:00",
-      author: "Mark Johnson"
-    },
-    { 
-      id: 3, 
-      title: "The Future of AI in Healthcare: 2024 Trends & Predictions", 
-      url: "/ai-healthcare-future", 
-      views: 8450, 
-      image: "/images/ai-healthcare.jpg",
-      datePublished: "2024-03-10T07:15:00+00:00",
-      author: "Dr. Sarah Williams"
-    },
-  ];
+  useEffect(() => {
+    if (!initialTrending || initialTrending.length === 0) {
+      console.log("🌀 Fetching trending articles client-side...");
+      getTrendingArticles().then((articles) => {
+        console.log("✅ Fetched trending client-side:", articles);
+        setTrending(articles);
+      });
+    } else {
+      console.log("✅ Using preloaded trending articles:", initialTrending);
+    }
+  }, [initialTrending]);
+
 
   const categories = [
     { name: "AI Writing Tools", count: 42, slug: "writing-tools", icon: "✍️", description: "Comprehensive reviews of AI-powered writing assistants and content generators" },
@@ -215,13 +199,14 @@ const Sidebar = () => {
         </section>
 
         {/* Popular Posts with Schema.org markup */}
-        <PopularPosts 
-          posts={popularPosts} 
-          title="Trending AI Articles" 
-          showImages={true}
-          viewCount={true}
-        />
-
+        {trending && trending.length > 0 ? (
+        <PopularPosts posts={trending} title="Trending AI Articles" />
+      ) : (
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+          <p className="text-sm text-gray-500">Loading trending articles...</p>
+        </div>
+      )}
+      
         {/* Categories/Tags List with semantic HTML */}
         <CategoryList 
           categories={categories} 
@@ -512,7 +497,7 @@ const Sidebar = () => {
         </section>
 
         {/* Newsletter Signup with enhanced metadata */}
-        <NewsletterSignup 
+        <NewsletterSignup
           title="Stay Updated on AI Developments"
           description="Subscribe to our newsletter for the latest AI news, tool reviews, and industry updates delivered weekly."
           className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 hover:shadow-md transition-shadow duration-200"
