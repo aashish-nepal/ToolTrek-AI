@@ -11,6 +11,18 @@ if (!contentfulConfig.space || !contentfulConfig.accessToken) {
 
 const client = createClient(contentfulConfig);
 
+// Helper function to fix Contentful image URLs
+const formatImageUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('//')) {
+    return `https:${url}`;
+  } else if (url.startsWith('http')) {
+    return url;
+  } else {
+    return `https://${url}`;
+  }
+};
+
 //
 // 🔍 BLOG FUNCTIONS
 //
@@ -24,7 +36,7 @@ export async function getAllArticles() {
     id: item.sys.id,
     title: item.fields.title,
     url: `/blog/${item.fields.slug}`,
-    image: item.fields.coverImage?.fields?.file?.url || '',
+    image: item.fields.coverImage?.fields?.file?.url ? formatImageUrl(item.fields.coverImage.fields.file.url) : '',
     views: item.fields.views || 0,
     datePublished: item.fields.datePublished,
     author: item.fields.author || 'Unknown',
@@ -44,7 +56,7 @@ export async function getTrendingArticles() {
     id: item.sys.id,
     title: item.fields.title,
     url: `/blog/${item.fields.slug}`,
-    image: item.fields.coverImage?.fields?.file?.url || '',
+    image: item.fields.coverImage?.fields?.file?.url ? formatImageUrl(item.fields.coverImage.fields.file.url) : '',
     views: item.fields.views || 0,
     datePublished: item.fields.datePublished,
     author: item.fields.author || 'Unknown',
@@ -55,7 +67,6 @@ export async function getTrendingArticles() {
 // 🚀 AI TOOL DIRECTORY FUNCTIONS
 //
 
-// ✅ Get all categories with tool counts and icons
 export async function getAllCategoriesWithCount() {
   const categoryEntries = await client.getEntries({ content_type: 'category' });
 
@@ -77,11 +88,11 @@ export async function getAllCategoriesWithCount() {
     name: cat.fields.name,
     slug: cat.fields.slug,
     count: countMap[cat.sys.id] || 0,
-    icon: cat.fields.icon?.fields?.file?.url || null,
+    icon: cat.fields.icon?.fields?.file?.url ? formatImageUrl(cat.fields.icon.fields.file.url) : null,
+    description: cat.fields.description || ''
   }));
 }
 
-// ✅ Get full category data with tools and icons
 export async function getCategoryBySlug(slug) {
   const categoryRes = await client.getEntries({
     content_type: 'category',
@@ -107,14 +118,13 @@ export async function getCategoryBySlug(slug) {
     category: {
       name: category.fields.name,
       slug: category.fields.slug,
-      icon: category.fields.icon
-      ? `https:${category.fields.icon.fields.file.url}`
-      : null,
+      icon: category.fields.icon ? formatImageUrl(category.fields.icon.fields.file.url) : null,
+      description: category.fields.description || ''
     },
     tools: toolsRes.items.map((tool) => ({
       name: tool.fields.name,
-      slug: tool.fields.slug || tool.sys.id, // fallback if slug not added
-      logo: tool.fields.logo?.fields?.file?.url || '',
+      slug: tool.fields.slug || tool.sys.id,
+      logo: tool.fields.logo?.fields?.file?.url ? formatImageUrl(tool.fields.logo.fields.file.url) : '',
       url: tool.fields.url || `/tools/${tool.fields.slug || tool.sys.id}`,
       rating: tool.fields.rating || 0,
       isSponsored: tool.fields.isSponsored || false,

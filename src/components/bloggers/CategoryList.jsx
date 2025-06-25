@@ -17,13 +17,16 @@ const CategoryList = ({ categories, title = "Categories", showIcons = false, sho
               className="flex justify-between items-center text-gray-700 hover:text-indigo-700 hover:bg-indigo-50 px-3 py-2 rounded-md transition-colors duration-200"
             >
               <div className="flex items-center gap-2">
-                {showIcons && isValidImageUrl(category.icon) && (
+                {showIcons && category.icon && isValidImageUrl(category.icon) && (
                   <Image 
                     src={category.icon} 
-                    alt={category.name} 
-                    width={20} 
-                    height={20} 
+                    alt={category.name}
+                    width={20}
+                    height={20}
                     className="rounded-sm"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
                   />
                 )}
                 <span>{category.name}</span>

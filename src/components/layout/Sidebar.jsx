@@ -3,14 +3,15 @@ import AdSenseBanner from '../ads/AdSenseBanner';
 import ToolComparisonBanner from '../tools/ToolComparisonBanner';
 import AuthorBox from '../authors/AuthorBox';
 import PopularPosts from '../bloggers/PopularPosts';
-import { getTrendingArticles } from '../../lib/contentful';
+import { getTrendingArticles, getAllCategoriesWithCount } from '../../lib/contentful';
 import CategoryList from '../bloggers/CategoryList';
 import RecentComments from '../bloggers/RecentComments';
 import { useState, useEffect } from 'react';
 import NewsletterSignup from '../monetization/NewsletterSignup';
 
-const Sidebar = ({ trendingArticles: initialTrending = [] }) => {
+const Sidebar = ({ trendingArticles: initialTrending = [], categories: initialCategories = [] }) => {
   const [trending, setTrending] = useState(initialTrending);
+  const [categories, setCategories] = useState(initialCategories);
 
   useEffect(() => {
     if (!initialTrending || initialTrending.length === 0) {
@@ -22,16 +23,19 @@ const Sidebar = ({ trendingArticles: initialTrending = [] }) => {
     } else {
       console.log("✅ Using preloaded trending articles:", initialTrending);
     }
-  }, [initialTrending]);
+
+    if (!initialCategories || initialCategories.length === 0) {
+      console.log("🌀 Fetching categories client-side...");
+      getAllCategoriesWithCount().then((cats) => {
+        console.log("✅ Fetched categories client-side:", cats);
+        setCategories(cats);
+      });
+    } else {
+      console.log("✅ Using preloaded categories:", initialCategories);
+    }
+  }, [initialTrending, initialCategories]);
 
 
-  const categories = [
-    { name: "AI Writing Tools", count: 42, slug: "writing-tools", icon: "✍️", description: "Comprehensive reviews of AI-powered writing assistants and content generators" },
-    { name: "Image Generation", count: 38, slug: "image-generation", icon: "🖼️", description: "Analysis of text-to-image AI systems and creative tools" },
-    { name: "Coding Assistants", count: 29, slug: "coding-assistants", icon: "💻", description: "Evaluations of AI programming tools and code generators" },
-    { name: "Video AI", count: 21, slug: "video-ai", icon: "🎥", description: "Reviews of AI video creation and editing platforms" },
-    { name: "AI Business Tools", count: 18, slug: "business-tools", icon: "📊", description: "Productivity and enterprise AI solutions for businesses" },
-  ];
 
   const featuredTools = [
     { 
@@ -179,7 +183,7 @@ const Sidebar = ({ trendingArticles: initialTrending = [] }) => {
       
         {/* Categories/Tags List with semantic HTML */}
         <CategoryList 
-          categories={categories} 
+          categories={categories.slice(0, 5)} 
           title="Browse AI Categories" 
           showIcons={true}
           showCounts={true}
@@ -528,5 +532,8 @@ const Sidebar = ({ trendingArticles: initialTrending = [] }) => {
     </>
   );
 };
+
+
+
 
 export default Sidebar;
