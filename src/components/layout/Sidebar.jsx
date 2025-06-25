@@ -33,36 +33,6 @@ const Sidebar = ({ trendingArticles: initialTrending = [] }) => {
     { name: "AI Business Tools", count: 18, slug: "business-tools", icon: "📊", description: "Productivity and enterprise AI solutions for businesses" },
   ];
 
-  const recentComments = [
-    { 
-      id: 1, 
-      author: "Sarah K", 
-      text: "Great comparison between GPT-4 and Claude 3! The benchmarks were particularly helpful.", 
-      url: "/gpt4-vs-claude3#comment-1", 
-      avatar: "/avatars/sarah.jpg", 
-      time: "2h ago",
-      commentDate: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
-    },
-    { 
-      id: 2, 
-      author: "Mike T", 
-      text: "Have you tested the new Midjourney update? The quality improvements are remarkable.", 
-      url: "/midjourney-v6-review#comment-5", 
-      avatar: "/avatars/mike.jpg", 
-      time: "5h ago",
-      commentDate: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
-    },
-    { 
-      id: 3, 
-      author: "Alex J", 
-      text: "Thanks for the detailed breakdown of AI writing tools. Saved me hours of research!", 
-      url: "/ai-writing-tools#comment-2", 
-      avatar: "/avatars/alex.jpg", 
-      time: "1d ago",
-      commentDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-    },
-  ];
-
   const featuredTools = [
     { 
       name: "ChatGPT-4", 
@@ -301,12 +271,11 @@ const Sidebar = ({ trendingArticles: initialTrending = [] }) => {
         />
 
         {/* Recent Comments with semantic markup */}
-        <RecentComments 
-          comments={recentComments} 
-          title="Latest Community Discussions" 
-          showAvatars={true}
-          showTimestamps={true}
-        />
+<RecentComments 
+  title="Latest Community Discussions" 
+  showAvatars={true}
+  showTimestamps={true}
+/>
 
         {/* Poll with accessible form */}
         <section className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
