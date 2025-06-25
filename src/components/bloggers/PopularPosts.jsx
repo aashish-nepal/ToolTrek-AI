@@ -1,11 +1,6 @@
 import Link from 'next/link';
 
 const PopularPosts = ({ posts = [], title = "Popular Posts" }) => {
-  
-  // 🔍 Debug logs — ADD HERE
-  console.log("🔥 PopularPosts typeof:", typeof posts);
-  console.log("🔥 PopularPosts Array.isArray?", Array.isArray(posts));
-  console.log("🔥 PopularPosts full:", posts);
 
   if (!Array.isArray(posts) || posts.length === 0) {
     return (

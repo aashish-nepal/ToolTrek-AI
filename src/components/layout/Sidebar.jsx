@@ -13,28 +13,27 @@ const Sidebar = ({ trendingArticles: initialTrending = [], categories: initialCa
   const [trending, setTrending] = useState(initialTrending);
   const [categories, setCategories] = useState(initialCategories);
 
-  useEffect(() => {
-    if (!initialTrending || initialTrending.length === 0) {
-      console.log("🌀 Fetching trending articles client-side...");
-      getTrendingArticles().then((articles) => {
-        console.log("✅ Fetched trending client-side:", articles);
-        setTrending(articles);
-      });
-    } else {
-      console.log("✅ Using preloaded trending articles:", initialTrending);
-    }
+ // Trending articles
+useEffect(() => {
+  if (initialTrending && initialTrending.length > 0) {
+    setTrending(initialTrending);
+  } else if (trending.length === 0) {
+    getTrendingArticles().then((articles) => {
+      setTrending(articles);
+    });
+  }
+}, [initialTrending]); 
 
-    if (!initialCategories || initialCategories.length === 0) {
-      console.log("🌀 Fetching categories client-side...");
-      getAllCategoriesWithCount().then((cats) => {
-        console.log("✅ Fetched categories client-side:", cats);
-        setCategories(cats);
-      });
-    } else {
-      console.log("✅ Using preloaded categories:", initialCategories);
-    }
-  }, [initialTrending, initialCategories]);
-
+// Categories
+useEffect(() => {
+  if (initialCategories && initialCategories.length > 0) {
+    setCategories(initialCategories);
+  } else if (categories.length === 0) {
+    getAllCategoriesWithCount().then((cats) => {
+      setCategories(cats);
+    });
+  }
+}, [initialCategories]); 
 
 
   const featuredTools = [

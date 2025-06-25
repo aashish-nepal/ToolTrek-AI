@@ -15,6 +15,7 @@ import Head from 'next/head';
 import { Analytics } from '@vercel/analytics/react';
 import CookieConsent from 'react-cookie-consent';
 
+
 const HomePage = () => {
   // Initialize AdSense
   useEffect(() => {
