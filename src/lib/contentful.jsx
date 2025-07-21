@@ -124,7 +124,7 @@ export async function getCategoryBySlug(slug) {
     tools: toolsRes.items.map((tool) => ({
       name: tool.fields.name,
       slug: tool.fields.slug || tool.sys.id,
-      logo: tool.fields.logo?.fields?.file?.url ? formatImageUrl(tool.fields.logo.fields.file.url) : '',
+      image: tool.fields.image?.fields?.file?.url ? formatImageUrl(tool.fields.image.fields.file.url) : '',
       url: tool.fields.url || `/tools/${tool.fields.slug || tool.sys.id}`,
       rating: tool.fields.rating || 0,
       isSponsored: tool.fields.isSponsored || false,
@@ -132,4 +132,45 @@ export async function getCategoryBySlug(slug) {
     })),
     allCategories,
   };
+}
+
+// ✅ Fetch all featured tools
+export async function getFeaturedAiTools() {
+  const entries = await client.getEntries({
+    content_type: 'aiTool',
+    'fields.isFeatured': true,
+    order: '-fields.rating', // Highest rated first
+  });
+
+  return entries.items.map(item => ({
+    id: item.sys.id,
+    name: item.fields.name,
+    slug: item.fields.slug,
+    url: item.fields.url,
+    image: item.fields.image?.fields.file.url || '',
+    category: item.fields.category || '',
+    rating: item.fields.rating || 0,
+    description: item.fields.description || '',
+    isSponsored: item.fields.isSponsored || false,
+  }));
+}
+
+// ✅ 🔥 Get All AI Tools (for "View All AI Tools" page)
+export async function getAllAiTools() {
+  const entries = await client.getEntries({
+    content_type: 'aiTool', 
+    order: 'fields.name',
+  });
+
+  return entries.items.map((item) => ({
+    id: item.sys.id,
+    name: item.fields.name,
+    slug: item.fields.slug,
+    url: item.fields.url,
+    image: item.fields.image?.fields.file.url || '',
+    category: item.fields.category || '',
+    rating: item.fields.rating || 0,
+    description: item.fields.description || '',
+    isSponsored: item.fields.isSponsored || false,
+  }));
 }

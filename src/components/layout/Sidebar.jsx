@@ -3,77 +3,68 @@ import AdSenseBanner from '../ads/AdSenseBanner';
 import ToolComparisonBanner from '../tools/ToolComparisonBanner';
 import AuthorBox from '../authors/AuthorBox';
 import PopularPosts from '../bloggers/PopularPosts';
-import { getTrendingArticles, getAllCategoriesWithCount } from '../../lib/contentful';
+import { getTrendingArticles, getAllCategoriesWithCount, getFeaturedAiTools } from '../../lib/contentful';
 import CategoryList from '../bloggers/CategoryList';
 import RecentComments from '../bloggers/RecentComments';
 import { useState, useEffect } from 'react';
 import NewsletterSignup from '../monetization/NewsletterSignup';
+import AiTool from '../bloggers/AiTool';
 
-const Sidebar = ({ trendingArticles: initialTrending = [], categories: initialCategories = [] }) => {
+const Sidebar = ({ 
+  trendingArticles: initialTrending = [], 
+  categories: initialCategories = [], 
+  featuredTools: initialFeaturedTools = [] 
+}) => {
   const [trending, setTrending] = useState(initialTrending);
   const [categories, setCategories] = useState(initialCategories);
+  const [featuredTools, setFeaturedTools] = useState(initialFeaturedTools);
 
- // Trending articles
-useEffect(() => {
-  if (initialTrending && initialTrending.length > 0) {
-    setTrending(initialTrending);
-  } else if (trending.length === 0) {
-    getTrendingArticles().then((articles) => {
-      setTrending(articles);
-    });
-  }
-}, [initialTrending]); 
+  // ✅ Trending Articles Effect
+  useEffect(() => {
+    if (initialTrending.length > 0) {
+      setTrending(initialTrending);
+    } else if (trending.length === 0) {
+      getTrendingArticles().then((articles) => {
+        setTrending(articles);
+      });
+    }
+  }, [initialTrending]);
 
-// Categories
-useEffect(() => {
-  if (initialCategories && initialCategories.length > 0) {
-    setCategories(initialCategories);
-  } else if (categories.length === 0) {
-    getAllCategoriesWithCount().then((cats) => {
-      setCategories(cats);
-    });
-  }
-}, [initialCategories]); 
+  // ✅ Categories Effect
+  useEffect(() => {
+    if (initialCategories.length > 0) {
+      setCategories(initialCategories);
+    } else if (categories.length === 0) {
+      getAllCategoriesWithCount().then((cats) => {
+        setCategories(cats);
+      });
+    }
+  }, [initialCategories]);
+
+  // ✅ Featured Tools Effect
+  useEffect(() => {
+    if (initialFeaturedTools.length > 0) {
+      setFeaturedTools(initialFeaturedTools);
+    } else if (featuredTools.length === 0) {
+      getFeaturedAiTools().then((tools) => {
+        setFeaturedTools(tools);
+      });
+    }
+  }, [initialFeaturedTools]);
+
+  useEffect(() => {
+    // Only load once
+    if (!document.getElementById('strawpoll-widget-script')) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.strawpoll.com/dist/widgets.js';
+      script.async = true;
+      script.id = 'strawpoll-widget-script';
+      script.charset = 'utf-8';
+      document.body.appendChild(script);
+    }
+  }, []);
 
 
-  const featuredTools = [
-    { 
-      name: "ChatGPT-4", 
-      logo: "/icons/chatgpt.png", 
-      url: "/tools/chatgpt", 
-      isSponsored: true, 
-      rating: 4.8, 
-      category: "Chatbots",
-      description: "OpenAI's most advanced conversational AI with multimodal capabilities"
-    },
-    { 
-      name: "Claude 3", 
-      logo: "/icons/claude.png", 
-      url: "/tools/claude", 
-      isSponsored: false, 
-      rating: 4.6, 
-      category: "Chatbots",
-      description: "Anthropic's safety-focused AI assistant with strong reasoning skills"
-    },
-    { 
-      name: "Midjourney V6", 
-      logo: "/icons/midjourney.png", 
-      url: "/tools/midjourney", 
-      isSponsored: true, 
-      rating: 4.9, 
-      category: "Image Generation",
-      description: "Cutting-edge text-to-image AI with photorealistic output"
-    },
-    { 
-      name: "Gemini Advanced", 
-      logo: "/icons/gemini.png", 
-      url: "/tools/gemini", 
-      isSponsored: false, 
-      rating: 4.5, 
-      category: "Chatbots",
-      description: "Google's most capable AI model with deep integration across Google services"
-    },
-  ];
 
   const upcomingEvent = {
     name: "AI Summit 2024: The Future of Artificial Intelligence",
@@ -86,9 +77,6 @@ useEffect(() => {
   };
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPollOption, setSelectedPollOption] = useState("");
-  const [pollSubmitted, setPollSubmitted] = useState(false);
-  const [pollResults, setPollResults] = useState(null);
   const [timeLeft, setTimeLeft] = useState({
     days: 45,
     hours: 12,
@@ -189,70 +177,8 @@ useEffect(() => {
         />
 
         {/* Featured AI Tools with enhanced metadata */}
-        <section className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-lg text-gray-800">Featured AI Tools</h2>
-            <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">Updated Daily</span>
-          </div>
-          <ul className="space-y-3" itemScope itemType="http://schema.org/ItemList">
-            {featuredTools.map((tool, index) => (
-              <li key={tool.name} className="flex items-center p-2 hover:bg-gray-50 rounded-md transition-colors duration-200 group" itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
-                <meta itemProp="position" content={index + 1} />
-                <img 
-                  src={tool.logo} 
-                  alt={`${tool.name} logo`} 
-                  className="w-10 h-10 mr-3 object-contain rounded-sm bg-gray-100 p-1" 
-                  loading="lazy"
-                  width={40}
-                  height={40}
-                  itemProp="image"
-                />
-                <div className="flex-1 min-w-0" itemScope itemType="http://schema.org/SoftwareApplication">
-                  <div className="flex items-start justify-between">
-                    <a 
-                      href={tool.url} 
-                      className="block font-medium text-gray-800 hover:text-indigo-700 truncate"
-                      itemProp="url"
-                    >
-                      <span itemProp="name">{tool.name}</span>
-                    </a>
-                    {tool.isSponsored && (
-                      <span className="ml-2 bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded" itemProp="isAccessibleForFree" content="false">Sponsored</span>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <div className="flex items-center">
-                      <span className="text-yellow-500 text-sm flex items-center" itemProp="aggregateRating" itemScope itemType="http://schema.org/AggregateRating">
-                        <meta itemProp="ratingValue" content={tool.rating.toString()} />
-                        <meta itemProp="bestRating" content="5" />
-                        ★ {tool.rating}
-                      </span>
-                      <span className="ml-2 text-xs text-gray-500" itemProp="applicationCategory">{tool.category}</span>
-                    </div>
-                    <a 
-                      href={tool.url} 
-                      className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
-                      aria-label={`Try ${tool.name}`}
-                    >
-                      Try Now →
-                    </a>
-                  </div>
-                  <meta itemProp="description" content={tool.description} />
-                </div>
-              </li>
-            ))}
-          </ul>
-          <a 
-            href="/ai-tools" 
-            className="mt-4 inline-flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium"
-            aria-label="View all AI tools"
-          >
-            View all 200+ AI tools
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
-        </section>
+        <AiTool featuredTools={featuredTools} />
+
 
         {/* Tool Comparison Banner with semantic markup */}
         <ToolComparisonBanner 
@@ -280,133 +206,47 @@ useEffect(() => {
   showTimestamps={true}
 />
 
-        {/* Poll with accessible form */}
-        <section className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-lg text-gray-800">Community Poll</h2>
-            <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">Live</span>
-          </div>
-          
-          {!pollSubmitted ? (
-            <>
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Which AI tool do you use most frequently?</h3>
-              <form onSubmit={handlePollSubmit} className="space-y-3">
-                <fieldset>
-                  <legend className="sr-only">AI tool preference poll</legend>
-                  {['ChatGPT', 'Claude', 'Gemini', 'Midjourney', 'Other'].map((option) => (
-                    <div key={option} className="flex items-center">
-                      <input 
-                        id={`poll-${option}`} 
-                        name="ai-tool-poll" 
-                        type="radio" 
-                        checked={selectedPollOption === option}
-                        onChange={() => setSelectedPollOption(option)}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
-                        required
-                      />
-                      <label htmlFor={`poll-${option}`} className="ml-3 text-sm text-gray-700">
-                        {option}
-                      </label>
-                    </div>
-                  ))}
-                </fieldset>
-                <button 
-                  type="submit"
-                  disabled={!selectedPollOption}
-                  className={`mt-3 w-full py-2 px-4 rounded-md text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                    selectedPollOption 
-                      ? 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500'
-                      : 'bg-gray-400 cursor-not-allowed'
-                  }`}
-                  aria-label="Submit poll vote"
-                >
-                  Submit Vote
-                </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Poll Results ({pollResults.totalVotes} votes)</h3>
-              <div className="space-y-4">
-                {pollResults.options.map((option) => (
-                  <div key={option.name} className="space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span className="font-medium">{option.name}</span>
-                      <span>{option.percentage}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-indigo-600 h-2 rounded-full" 
-                        style={{ width: `${option.percentage}%` }}
-                        aria-label={`${option.percentage} percent`}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-3 text-xs text-gray-500 text-center">
-                Thanks for participating! Poll updates in real-time.
-              </p>
-            </>
-          )}
-        </section>
+        {/* Community Poll using StrawPoll */}
+<section className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+  <div className="flex items-center justify-between mb-4">
+    <h2 className="font-semibold text-lg text-gray-800">Community Poll</h2>
+    <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">Live</span>
+  </div>
 
-        {/* Countdown to Event with Schema.org markup */}
-        <section 
-          className="relative bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-5 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200"
-          style={{
-            backgroundImage: "linear-gradient(rgba(79, 70, 229, 0.9), rgba(124, 58, 237, 0.9)), url('/images/ai-pattern.png')",
-            backgroundSize: "cover"
-          }}
-          itemScope
-          itemType="http://schema.org/Event"
-        >
-          <div className="absolute top-0 right-0 text-xs bg-white text-indigo-800 px-2 py-1 rounded-bl-lg">
-            Featured Event
-          </div>
-          <h2 className="font-semibold text-lg mb-2" itemProp="name">{upcomingEvent.name}</h2>
-          <p className="text-sm font-medium mb-1" itemProp="description">{upcomingEvent.description}</p>
-          <p className="text-xs text-indigo-100 mb-3 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span itemProp="location" itemScope itemType="http://schema.org/Place">
-              <span itemProp="name">{upcomingEvent.location}</span>
-            </span>
-          </p>
-          <meta itemProp="startDate" content={upcomingEvent.date} />
-          <meta itemProp="organizer" content={upcomingEvent.organizer} />
-          <div className="flex justify-between text-center mb-4">
-            <div className="bg-white bg-opacity-20 rounded p-2 flex-1 mx-1">
-              <div className="text-2xl font-bold">{timeLeft.days}</div>
-              <div className="text-xs opacity-90">Days</div>
-            </div>
-            <div className="bg-white bg-opacity-20 rounded p-2 flex-1 mx-1">
-              <div className="text-2xl font-bold">{timeLeft.hours}</div>
-              <div className="text-xs opacity-90">Hours</div>
-            </div>
-            <div className="bg-white bg-opacity-20 rounded p-2 flex-1 mx-1">
-              <div className="text-2xl font-bold">{timeLeft.minutes}</div>
-              <div className="text-xs opacity-90">Mins</div>
-            </div>
-            <div className="bg-white bg-opacity-20 rounded p-2 flex-1 mx-1">
-              <div className="text-2xl font-bold">{timeLeft.seconds}</div>
-              <div className="text-xs opacity-90">Secs</div>
-            </div>
-          </div>
-          <a 
-            href={upcomingEvent.url} 
-            className="mt-2 inline-flex items-center justify-center w-full bg-white text-indigo-600 text-center py-2 px-4 rounded-md hover:bg-gray-100 transition-colors font-medium text-sm"
-            aria-label={`Register for ${upcomingEvent.name}`}
-            itemProp="url"
-          >
-            Register Now
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </a>
-        </section>
+  <div
+    className="strawpoll-embed"
+    id="strawpoll_6QnMQ9k4bne"
+    style={{
+      height: '500px', 
+      maxWidth: '640px',
+      width: '100%',
+      margin: '0 auto',
+      display: 'flex',
+      flexDirection: 'column',
+      overflowY: 'auto', 
+    }}
+  >
+    <iframe
+      title="StrawPoll Embed"
+      id="strawpoll_iframe_6QnMQ9k4bne"
+      src="https://strawpoll.com/embed/6QnMQ9k4bne"
+      style={{
+        position: 'static',
+        visibility: 'visible',
+        display: 'block',
+        width: '100%',
+        flexGrow: 1,
+        minHeight: '500px', 
+      }}
+      frameBorder="0"
+      allowFullScreen
+      allowTransparency
+    >
+      Loading...
+    </iframe>
+  </div>
+</section>
+
 
         {/* Community Links with proper semantics */}
         <section className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
